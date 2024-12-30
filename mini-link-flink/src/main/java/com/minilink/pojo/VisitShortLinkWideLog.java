@@ -29,6 +29,11 @@ public class VisitShortLinkWideLog {
     private String city;
 
     /**
+     * 浏览器指纹
+     */
+    private String userAgent;
+
+    /**
      * 设备类型
      */
     private String deviceType;

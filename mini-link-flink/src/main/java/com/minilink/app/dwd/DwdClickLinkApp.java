@@ -2,10 +2,10 @@ package com.minilink.app.dwd;
 
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import com.minilink.app.func.DwdClickLinkStateMapFunction;
+import com.minilink.app.func.VisitorStateMapFunction;
 import com.minilink.constant.KafkaConstant;
 import com.minilink.util.FlinkKafkaUtil;
-import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
@@ -13,7 +13,6 @@ import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
-import org.apache.flink.util.Collector;
 
 /**
  * @Author: 徐志斌
@@ -30,14 +29,13 @@ public class DwdClickLinkApp {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         FlinkKafkaConsumer kafkaConsumer = FlinkKafkaUtil.getKafkaConsumer(SOURCE_TOPIC, DWD_CLICK_LINK_GROUP);
         DataStreamSource jsonStrDS = env.addSource(kafkaConsumer);
-        jsonStrDS.print("----------DWD-接收到ODS队列消息----------");
+        jsonStrDS.print(">>>>>>>>DWD-jsonStrDS");
 
-        SingleOutputStreamOperator<JSONObject> jsonObjDS = jsonStrDS.flatMap(
-                new FlatMapFunction<String, JSONObject>() {
+        SingleOutputStreamOperator<JSONObject> jsonObjDS = jsonStrDS.map(
+                new MapFunction<String, JSONObject>() {
                     @Override
-                    public void flatMap(String msg, Collector collector) {
-                        JSONObject jsonObj = JSONUtil.toBean(msg, JSONObject.class);
-                        collector.collect(jsonObj);
+                    public JSONObject map(String msg) {
+                        return JSONUtil.toBean(msg, JSONObject.class);
                     }
                 }
         );
@@ -51,10 +49,10 @@ public class DwdClickLinkApp {
                 }
         );
 
-        SingleOutputStreamOperator<String> visitorStateDS = keyedStream.map(new DwdClickLinkStateMapFunction());
+        SingleOutputStreamOperator<String> visitorStateDS = keyedStream.map(new VisitorStateMapFunction());
         FlinkKafkaProducer kafkaProducer = FlinkKafkaUtil.getKafkaProducer(SINK_TOPIC);
         visitorStateDS.addSink(kafkaProducer);
-        visitorStateDS.print("----------DWD-标记新老客后数据----------");
+        visitorStateDS.print(">>>>>>>>DWD-visitorStateDS");
         env.execute();
     }
 }

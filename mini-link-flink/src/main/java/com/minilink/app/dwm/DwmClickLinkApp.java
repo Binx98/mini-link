@@ -1,21 +1,16 @@
 package com.minilink.app.dwm;
 
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
+import com.minilink.app.func.DeviceMapFunction;
+import com.minilink.app.func.LocationMapFunction;
 import com.minilink.constant.KafkaConstant;
 import com.minilink.pojo.VisitShortLinkWideLog;
-import com.minilink.util.AMapUtil;
-import com.minilink.util.DateTimeUtil;
 import com.minilink.util.FlinkKafkaUtil;
-import com.minilink.util.UserAgentUtil;
-import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
+import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
-import org.apache.flink.util.Collector;
-
-import java.util.Map;
 
 /**
  * @Author: 徐志斌
@@ -35,47 +30,43 @@ public class DwmClickLinkApp {
         DataStreamSource jsonStrDS = env.addSource(kafkaConsumer);
 
         // 数据补齐：访问设备相关
-        SingleOutputStreamOperator<VisitShortLinkWideLog> addDeviceDS = jsonStrDS.flatMap(
-                new FlatMapFunction<String, VisitShortLinkWideLog>() {
-                    @Override
-                    public void flatMap(String jsonStr, Collector collector) {
-                        JSONObject jsonObj = JSONUtil.toBean(jsonStr, JSONObject.class);
-                        String userAgentStr = jsonObj.getStr("userAgent");
-                        String ip = jsonObj.getStr("ip");
-                        String browserType = UserAgentUtil.getBrowserType(userAgentStr);
-                        String osType = UserAgentUtil.getOsType(userAgentStr);
-                        String deviceType = UserAgentUtil.getDeviceType(userAgentStr);
-                        String visitTimeStamp = jsonObj.getStr("visitTime");
-                        String visitorState = jsonObj.getStr("visitorState");
-
-                        VisitShortLinkWideLog msgLog = new VisitShortLinkWideLog();
-                        msgLog.setIp(ip);
-                        msgLog.setVisitorState(visitorState);
-                        msgLog.setBrowserType(browserType);
-                        msgLog.setOsType(osType);
-                        msgLog.setDeviceType(deviceType);
-                        msgLog.setVisitTime(DateTimeUtil.timeStampToLocalDateTime(Long.valueOf(visitTimeStamp)));
-                        collector.collect(msgLog);
-                    }
-                }
-        );
-        addDeviceDS.print("----------DWM-访问设备数据补充----------");
+        SingleOutputStreamOperator<VisitShortLinkWideLog> addDeviceDS = jsonStrDS.map(new DeviceMapFunction());
+        addDeviceDS.print(">>>>>>>>DWM-addDeviceDS");
 
         // 数据补齐：访问地址相关
-        SingleOutputStreamOperator<VisitShortLinkWideLog> addRegionDS = addDeviceDS.flatMap(
-                new FlatMapFunction<VisitShortLinkWideLog, VisitShortLinkWideLog>() {
+        SingleOutputStreamOperator<VisitShortLinkWideLog> addRegionDS = addDeviceDS.map(new LocationMapFunction());
+        addRegionDS.print(">>>>>>>>DWM-addRegionDS");
+
+        // 分组
+        KeyedStream<VisitShortLinkWideLog, String> groupDS = addRegionDS.keyBy(
+                new KeySelector<VisitShortLinkWideLog, String>() {
                     @Override
-                    public void flatMap(VisitShortLinkWideLog wideLog, Collector collector) {
-                        Map<String, String> locationMap = AMapUtil.getLocationByIp(wideLog.getIp());
-                        wideLog.setProvince(locationMap.get(locationMap.get("province")));
-                        wideLog.setCity(locationMap.get(locationMap.get("city")));
-                        collector.collect(wideLog);
+                    public String getKey(VisitShortLinkWideLog wideLog) {
+                        return wideLog.getUserAgent();
                     }
                 }
         );
-        addRegionDS.print("----------DWM-访问地区数据补充----------");
+        groupDS.print(">>>>>>>>DWM-groupDS");
 
-        // TODO 独立访客数据聚合
+//        // 过滤重复访问（拿到独立访客）
+//        groupDS.filter(
+//                new RichFilterFunction<VisitShortLinkWideLog>() {
+//                    @Override
+//                    public void open(Configuration parameters) throws Exception {
+//                        super.open(parameters);
+//                    }
+//
+//                    @Override
+//                    public void close() throws Exception {
+//                        super.close();
+//                    }
+//
+//                    @Override
+//                    public boolean filter(VisitShortLinkWideLog wideLog) throws Exception {
+//                        return false;
+//                    }
+//                }
+//        );
 
 
         // TODO 数据推送到下游 DWS
