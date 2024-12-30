@@ -2,7 +2,7 @@ package com.minilink.app.dwd;
 
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import com.minilink.app.func.VisitorStateMapFunction;
+import com.minilink.app.func.VisitorStateRichMapFunction;
 import com.minilink.constant.KafkaConstant;
 import com.minilink.util.FlinkKafkaUtil;
 import org.apache.flink.api.common.functions.MapFunction;
@@ -17,7 +17,7 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
 /**
  * @Author: 徐志斌
  * @CreateTime: 2024-12-23  15:30
- * @Description: 访问短链接埋点 DWD
+ * @Description: DWD-访问短链接
  * @Version: 1.0
  */
 public class DwdClickLinkApp {
@@ -49,7 +49,7 @@ public class DwdClickLinkApp {
                 }
         );
 
-        SingleOutputStreamOperator<String> visitorStateDS = keyedStream.map(new VisitorStateMapFunction());
+        SingleOutputStreamOperator<String> visitorStateDS = keyedStream.map(new VisitorStateRichMapFunction());
         FlinkKafkaProducer kafkaProducer = FlinkKafkaUtil.getKafkaProducer(SINK_TOPIC);
         visitorStateDS.addSink(kafkaProducer);
         visitorStateDS.print(">>>>>>>>DWD-visitorStateDS");

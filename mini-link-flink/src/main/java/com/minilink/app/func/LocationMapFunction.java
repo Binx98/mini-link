@@ -16,8 +16,8 @@ public class LocationMapFunction implements MapFunction<VisitShortLinkWideLog, V
     @Override
     public VisitShortLinkWideLog map(VisitShortLinkWideLog wideLog) {
         Map<String, String> locationMap = AMapUtil.getLocationByIp(wideLog.getIp());
-        wideLog.setProvince(locationMap.get(locationMap.get("province")));
-        wideLog.setCity(locationMap.get(locationMap.get("city")));
+        wideLog.setProvince(locationMap.get("province"));
+        wideLog.setCity(locationMap.get("city"));
         return wideLog;
     }
 }

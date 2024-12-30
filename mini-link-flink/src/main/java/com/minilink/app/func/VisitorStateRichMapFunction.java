@@ -5,8 +5,10 @@ import cn.hutool.json.JSONUtil;
 import com.minilink.enums.VisitorStateEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.api.common.state.StateTtlConfig;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
+import org.apache.flink.api.common.time.Time;
 import org.apache.flink.configuration.Configuration;
 
 /**
@@ -15,12 +17,14 @@ import org.apache.flink.configuration.Configuration;
  * @Description: DWD-新老访客
  * @Version: 1.0
  */
-public class VisitorStateMapFunction extends RichMapFunction<JSONObject, String> {
+public class VisitorStateRichMapFunction extends RichMapFunction<JSONObject, String> {
     private ValueState<String> visitorState;
 
     @Override
     public void open(Configuration parameters) {
         ValueStateDescriptor<String> stateDescriptor = new ValueStateDescriptor<>("visitorState", String.class);
+        StateTtlConfig ttlConfig = StateTtlConfig.newBuilder(Time.days(30)).build();
+        stateDescriptor.enableTimeToLive(ttlConfig);
         visitorState = getRuntimeContext().getState(stateDescriptor);
     }
 

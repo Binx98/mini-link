@@ -15,7 +15,7 @@ import org.apache.flink.api.common.functions.MapFunction;
  */
 public class DeviceMapFunction implements MapFunction<String, VisitShortLinkWideLog> {
     @Override
-    public VisitShortLinkWideLog map(String msg) throws Exception {
+    public VisitShortLinkWideLog map(String msg) {
         JSONObject jsonObj = JSONUtil.toBean(msg, JSONObject.class);
         String userAgentStr = jsonObj.getStr("userAgent");
         String ip = jsonObj.getStr("ip");

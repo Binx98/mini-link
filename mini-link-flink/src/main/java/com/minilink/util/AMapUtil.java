@@ -16,9 +16,6 @@ public class AMapUtil {
     private static String AMAP_SECRET = "9269ad4b210d90de42f6104e14231bbf";
     private static String IP_LOCATION_API = "https://restapi.amap.com/v3/ip?key=" + AMAP_SECRET + "&ip=%s";
 
-    /**
-     * 根据 ip 地址获取地区
-     */
     public static Map<String, String> getLocationByIp(String ip) {
         String restApi = String.format(IP_LOCATION_API, ip);
         String locationStr = OkHttpUtil.get(restApi);
