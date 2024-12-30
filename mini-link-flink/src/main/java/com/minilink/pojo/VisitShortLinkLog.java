@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
  * @Version: 1.0
  */
 @Data
-public class VisitShortLinkWideLog {
+public class VisitShortLinkLog {
     /**
      * ip
      */
@@ -59,4 +59,15 @@ public class VisitShortLinkWideLog {
      * 访问时间
      */
     private LocalDateTime visitTime;
+
+    /**
+     * pv 浏览量
+     */
+    private Long pv;
+
+    /**
+     * uv 访客量
+     */
+    private Long uv;
+
 }

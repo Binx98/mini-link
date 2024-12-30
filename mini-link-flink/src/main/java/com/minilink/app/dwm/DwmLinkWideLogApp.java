@@ -4,7 +4,7 @@ import cn.hutool.json.JSONUtil;
 import com.minilink.app.func.DeviceMapFunction;
 import com.minilink.app.func.LocationMapFunction;
 import com.minilink.constant.KafkaConstant;
-import com.minilink.pojo.VisitShortLinkWideLog;
+import com.minilink.pojo.VisitShortLinkLog;
 import com.minilink.util.FlinkKafkaUtil;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
@@ -28,10 +28,10 @@ public class DwmLinkWideLogApp {
         FlinkKafkaConsumer kafkaConsumer = FlinkKafkaUtil.getKafkaConsumer(SOURCE_TOPIC, GROUP);
         DataStreamSource jsonStrDS = env.addSource(kafkaConsumer);
 
-        SingleOutputStreamOperator<VisitShortLinkWideLog> addDeviceDS = jsonStrDS.map(new DeviceMapFunction());
+        SingleOutputStreamOperator<VisitShortLinkLog> addDeviceDS = jsonStrDS.map(new DeviceMapFunction());
         addDeviceDS.print(">>>>>>>>DWM-addDeviceDS");
 
-        SingleOutputStreamOperator<VisitShortLinkWideLog> addRegionDS = addDeviceDS.map(new LocationMapFunction());
+        SingleOutputStreamOperator<VisitShortLinkLog> addRegionDS = addDeviceDS.map(new LocationMapFunction());
         addRegionDS.print(">>>>>>>>DWM-addRegionDS");
 
         SingleOutputStreamOperator<String> jsonStr = addRegionDS.map(JSONUtil::toJsonStr);

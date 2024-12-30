@@ -1,6 +1,6 @@
 package com.minilink.app.func;
 
-import com.minilink.pojo.VisitShortLinkWideLog;
+import com.minilink.pojo.VisitShortLinkLog;
 import com.minilink.util.DateTimeUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.functions.RichFilterFunction;
@@ -18,7 +18,7 @@ import java.io.IOException;
  * @Description: DWM-独立访客UV
  * @Version: 1.0
  */
-public class VisitorUniqueRichFilterFunction extends RichFilterFunction<VisitShortLinkWideLog> {
+public class VisitorUniqueRichFilterFunction extends RichFilterFunction<VisitShortLinkLog> {
     private ValueState<String> uniqueState;
 
     @Override
@@ -30,7 +30,7 @@ public class VisitorUniqueRichFilterFunction extends RichFilterFunction<VisitSho
     }
 
     @Override
-    public boolean filter(VisitShortLinkWideLog wideLog) throws IOException {
+    public boolean filter(VisitShortLinkLog wideLog) throws IOException {
         String visitTime = DateTimeUtil.format(wideLog.getVisitTime());
         String beforeTime = uniqueState.value();
         if (StringUtils.isEmpty(beforeTime)) {

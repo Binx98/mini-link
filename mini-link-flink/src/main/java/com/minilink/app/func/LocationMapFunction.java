@@ -1,6 +1,6 @@
 package com.minilink.app.func;
 
-import com.minilink.pojo.VisitShortLinkWideLog;
+import com.minilink.pojo.VisitShortLinkLog;
 import com.minilink.util.AMapUtil;
 import org.apache.flink.api.common.functions.MapFunction;
 
@@ -12,9 +12,9 @@ import java.util.Map;
  * @Description: DWM-设备信息
  * @Version: 1.0
  */
-public class LocationMapFunction implements MapFunction<VisitShortLinkWideLog, VisitShortLinkWideLog> {
+public class LocationMapFunction implements MapFunction<VisitShortLinkLog, VisitShortLinkLog> {
     @Override
-    public VisitShortLinkWideLog map(VisitShortLinkWideLog wideLog) {
+    public VisitShortLinkLog map(VisitShortLinkLog wideLog) {
         Map<String, String> locationMap = AMapUtil.getLocationByIp(wideLog.getIp());
         wideLog.setProvince(locationMap.get("province"));
         wideLog.setCity(locationMap.get("city"));

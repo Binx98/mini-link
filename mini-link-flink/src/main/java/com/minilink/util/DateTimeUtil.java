@@ -61,6 +61,13 @@ public class DateTimeUtil {
     }
 
     /**
+     * LocalDateTime 转 timestamp
+     */
+    public static Long localDateTimeToTimeStamp(LocalDateTime time) {
+        return time.atZone(DEFAULT_ZONE_ID).toInstant().getEpochSecond();
+    }
+
+    /**
      * String 转 Date
      */
     public static Date strToDate(String time) {

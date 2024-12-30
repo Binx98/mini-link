@@ -3,7 +3,7 @@ package com.minilink.app.dwm;
 import cn.hutool.json.JSONUtil;
 import com.minilink.app.func.VisitorUniqueRichFilterFunction;
 import com.minilink.constant.KafkaConstant;
-import com.minilink.pojo.VisitShortLinkWideLog;
+import com.minilink.pojo.VisitShortLinkLog;
 import com.minilink.util.FlinkKafkaUtil;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.KeySelector;
@@ -31,25 +31,25 @@ public class DwmUniqueVisitorApp {
         DataStreamSource jsonStrDS = env.addSource(kafkaConsumer);
         jsonStrDS.print(">>>>>>>>DWM-jsonStrDS");
 
-        SingleOutputStreamOperator<VisitShortLinkWideLog> wideLogDS = jsonStrDS.map(
-                new MapFunction<String, VisitShortLinkWideLog>() {
+        SingleOutputStreamOperator<VisitShortLinkLog> wideLogDS = jsonStrDS.map(
+                new MapFunction<String, VisitShortLinkLog>() {
                     @Override
-                    public VisitShortLinkWideLog map(String msg) throws Exception {
-                        return JSONUtil.toBean(msg, VisitShortLinkWideLog.class);
+                    public VisitShortLinkLog map(String msg) throws Exception {
+                        return JSONUtil.toBean(msg, VisitShortLinkLog.class);
                     }
                 }
         );
 
-        KeyedStream<VisitShortLinkWideLog, String> groupDS = wideLogDS.keyBy(
-                new KeySelector<VisitShortLinkWideLog, String>() {
+        KeyedStream<VisitShortLinkLog, String> groupDS = wideLogDS.keyBy(
+                new KeySelector<VisitShortLinkLog, String>() {
                     @Override
-                    public String getKey(VisitShortLinkWideLog wideLog) {
+                    public String getKey(VisitShortLinkLog wideLog) {
                         return wideLog.getUserAgent();
                     }
                 }
         );
 
-        SingleOutputStreamOperator<VisitShortLinkWideLog> uniqueVisitorDS = groupDS.filter(new VisitorUniqueRichFilterFunction());
+        SingleOutputStreamOperator<VisitShortLinkLog> uniqueVisitorDS = groupDS.filter(new VisitorUniqueRichFilterFunction());
         uniqueVisitorDS.print(">>>>>>>>DWM-uniqueVisitorDS");
 
         SingleOutputStreamOperator<String> jsonStr = uniqueVisitorDS.map(JSONUtil::toJsonStr);

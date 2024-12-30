@@ -2,7 +2,7 @@ package com.minilink.app.func;
 
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import com.minilink.pojo.VisitShortLinkWideLog;
+import com.minilink.pojo.VisitShortLinkLog;
 import com.minilink.util.DateTimeUtil;
 import com.minilink.util.UserAgentUtil;
 import org.apache.flink.api.common.functions.MapFunction;
@@ -13,9 +13,9 @@ import org.apache.flink.api.common.functions.MapFunction;
  * @Description: DWM-设备信息
  * @Version: 1.0
  */
-public class DeviceMapFunction implements MapFunction<String, VisitShortLinkWideLog> {
+public class DeviceMapFunction implements MapFunction<String, VisitShortLinkLog> {
     @Override
-    public VisitShortLinkWideLog map(String msg) {
+    public VisitShortLinkLog map(String msg) {
         JSONObject jsonObj = JSONUtil.toBean(msg, JSONObject.class);
         String userAgentStr = jsonObj.getStr("userAgent");
         String ip = jsonObj.getStr("ip");
@@ -24,7 +24,7 @@ public class DeviceMapFunction implements MapFunction<String, VisitShortLinkWide
         String deviceType = UserAgentUtil.getDeviceType(userAgentStr);
         String visitTimeStamp = jsonObj.getStr("visitTime");
         String visitorState = jsonObj.getStr("visitorState");
-        VisitShortLinkWideLog msgLog = new VisitShortLinkWideLog();
+        VisitShortLinkLog msgLog = new VisitShortLinkLog();
         msgLog.setIp(ip);
         msgLog.setUserAgent(userAgentStr);
         msgLog.setVisitorState(visitorState);

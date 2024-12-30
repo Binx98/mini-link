@@ -31,4 +31,6 @@ public class KafkaConstant {
     public static final String DWD_CLICK_LINK_GROUP = "dwd_click_link_group";
     public static final String DWM_WIDE_LOG_GROUP = "dwm_wide_log_group";
     public static final String DWM_UNIQUE_VISITOR_GROUP = "dwm_unique_visitor_group";
+    public static final String DWS_WIDE_LOG_GROUP = "dws_wide_log_group";
+    public static final String DWS_UNIQUE_VISITOR_GROUP = "dws_unique_visitor_group";
 }
