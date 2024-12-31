@@ -1,15 +1,15 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: backend-service
+  name: mini-link-data-service
   namespace: mini-link-namespace
   labels:
-    app: backend-label
+    app: mini-link-data-label
 spec:
   selector:
-    app: backend-label
+    app: mini-link-data-label
   type: ClusterIP
   ports:
     - protocol: TCP
-      port: 8080
-      targetPort: 8080
+      port: 8003
+      targetPort: 8003

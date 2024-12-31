@@ -17,10 +17,10 @@ spec:
     spec:
       containers:
         - name: backend
-          image: 镜像仓库内网IP:9999/minilink/mini-link-core:1.0
+          image: 镜像仓库IP:端口/minilink/mini-link-core:1.0
           imagePullPolicy: Always
           ports:
-            - containerPort: 9001
+            - containerPort: 8002
           resources:
             requests:
               memory: 300Mi
@@ -28,3 +28,13 @@ spec:
             limits:
               memory: 500Mi
               cpu: 400m
+          readinessProbe:
+            tcpSocket:
+              port: 8002
+            initialDelaySeconds: 60
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 8002
+            initialDelaySeconds: 60
+            periodSeconds: 10

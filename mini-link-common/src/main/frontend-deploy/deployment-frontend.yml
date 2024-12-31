@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: 镜像仓库内网IP:9999/minilink/mini-link-frontend:1.0
+          image: 镜像仓库内网IP:端口/minilink/mini-link-frontend:1.0
           imagePullPolicy: Always
           ports:
             - containerPort: 80

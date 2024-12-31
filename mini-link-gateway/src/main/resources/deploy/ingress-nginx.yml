@@ -6,10 +6,9 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: mini.link.com
+    - host: minilink.com
       http:
         paths:
-          # 前端项目 Service
           - path: /
             pathType: Prefix
             backend:
