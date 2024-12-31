@@ -54,7 +54,7 @@ public class DateTimeUtil {
     }
 
     /**
-     * timestamp 转 LocalDateTime
+     * timestamp 转 LocalDateTime，默认日期格式
      */
     public static LocalDateTime timeStampToLocalDateTime(long timestamp) {
         return LocalDateTime.ofInstant(new Date(timestamp).toInstant(), DEFAULT_ZONE_ID);
@@ -65,20 +65,5 @@ public class DateTimeUtil {
      */
     public static Long localDateTimeToTimeStamp(LocalDateTime time) {
         return time.atZone(DEFAULT_ZONE_ID).toInstant().getEpochSecond();
-    }
-
-    /**
-     * String 转 Date
-     */
-    public static Date strToDate(String time) {
-        LocalDateTime localDateTime = LocalDateTime.parse(time, DEFAULT_DATE_TIME_FORMATTER);
-        return Date.from(localDateTime.atZone(DEFAULT_ZONE_ID).toInstant());
-    }
-
-    /**
-     * String 转 LocalDateTime，默认日期格式
-     */
-    public static LocalDateTime strToLocalDateTime(String time) {
-        return LocalDateTime.parse(time, DEFAULT_DATE_TIME_FORMATTER);
     }
 }
