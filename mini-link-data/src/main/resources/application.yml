@@ -1,7 +1,9 @@
+spring:
+  application:
+    name: mini-link-data
+  profiles:
+    active: dev
 server:
   port: 8003
   servlet:
     context-path: /data
-spring:
-  application:
-    name: mini-link-data
