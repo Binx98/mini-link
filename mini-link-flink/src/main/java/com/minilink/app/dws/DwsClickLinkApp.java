@@ -1,7 +1,6 @@
 package com.minilink.app.dws;
 
 import cn.hutool.json.JSONUtil;
-import com.minilink.app.sink.ClickHouseSink;
 import com.minilink.constant.KafkaConstant;
 import com.minilink.pojo.VisitShortLinkLog;
 import com.minilink.util.DateTimeUtil;
@@ -10,12 +9,13 @@ import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.java.functions.KeySelector;
-import org.apache.flink.api.java.tuple.Tuple7;
+import org.apache.flink.api.java.tuple.Tuple9;
 import org.apache.flink.streaming.api.datastream.*;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
+import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.util.Collector;
 
@@ -33,7 +33,7 @@ public class DwsClickLinkApp {
     public static final String SOURCE_TOPIC_UNIQUE_VISITOR = KafkaConstant.DWM_UNIQUE_VISITOR_TOPIC;
     public static final String GROUP_UNIQUE_VISITOR = KafkaConstant.DWS_UNIQUE_VISITOR_GROUP;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         FlinkKafkaConsumer wideLogConsumer = FlinkKafkaUtil.getKafkaConsumer(SOURCE_TOPIC_WIDE_LOG, GROUP_WIDE_LOG);
         DataStreamSource wideLogJsonStr = env.addSource(wideLogConsumer);
@@ -74,10 +74,11 @@ public class DwsClickLinkApp {
         );
 
         KeyedStream keyedStreamDS = waterMarkDS.keyBy(
-                new KeySelector<VisitShortLinkLog, Tuple7>() {
+                new KeySelector<VisitShortLinkLog, Tuple9<Long, String, String, String, String, String, String, String, String>>() {
                     @Override
-                    public Tuple7 getKey(VisitShortLinkLog log) throws Exception {
-                        return Tuple7.of(
+                    public Tuple9<Long, String, String, String, String, String, String, String, String> getKey(VisitShortLinkLog log) throws Exception {
+                        return Tuple9.of(
+                                log.getAccountId(), log.getShortLinkCode(),
                                 log.getIp(), log.getProvince(), log.getCity(),
                                 log.getBrowserType(), log.getDeviceType(),
                                 log.getOsType(), log.getVisitorState()
@@ -98,14 +99,22 @@ public class DwsClickLinkApp {
                     }
                 },
 
-                new ProcessWindowFunction() {
+                new ProcessWindowFunction<VisitShortLinkLog, Object, Tuple9<Long, String, String, String, String, String, String, String, String>, TimeWindow>() {
                     @Override
-                    public void process(Object o, Context context, Iterable iterable, Collector collector) throws Exception {
-
+                    public void process(Tuple9<Long, String, String, String, String, String, String, String, String> tuple9,
+                                        ProcessWindowFunction<VisitShortLinkLog, Object, Tuple9<Long, String, String, String, String, String, String, String, String>,
+                                                TimeWindow>.Context context, Iterable<VisitShortLinkLog> iterable, Collector<Object> collector) throws Exception {
+                        String startTime = DateTimeUtil.format(context.window().getStart());
+                        String endTime = DateTimeUtil.format(context.window().getEnd());
+                        for (VisitShortLinkLog log : iterable) {
+                            log.setStartTime(startTime);
+                            log.setEndTime(endTime);
+                        }
                     }
                 }
         );
         reduceDS.print(">>>>>>>>DWS-reduceDS");
-        reduceDS.addSink(ClickHouseSink.getJdbcSink("insert into link_visit_stats values(?,?,?,?,?,?,?)"));
+//        reduceDS.addSink(ClickHouseSink.getJdbcSink("insert into link_visit_stats values(?,?,?,?,?,?,?,?,?)"));
+        env.execute();
     }
 }

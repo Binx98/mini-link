@@ -16,13 +16,15 @@ import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 public class ClickHouseSink {
     public static SinkFunction getJdbcSink(String sql) {
         JdbcStatementBuilder<VisitShortLinkLog> statementBuilder = (statement, param) -> {
-            statement.setObject(1, param.getIp());
-            statement.setObject(2, param.getProvince());
-            statement.setObject(3, param.getCity());
-            statement.setObject(4, param.getBrowserType());
-            statement.setObject(5, param.getDeviceType());
-            statement.setObject(6, param.getOsType());
-            statement.setObject(7, param.getVisitorState());
+            statement.setObject(1, param.getAccountId());
+            statement.setObject(2, param.getShortLinkCode());
+            statement.setObject(3, param.getIp());
+            statement.setObject(4, param.getProvince());
+            statement.setObject(5, param.getCity());
+            statement.setObject(6, param.getBrowserType());
+            statement.setObject(7, param.getDeviceType());
+            statement.setObject(8, param.getOsType());
+            statement.setObject(9, param.getVisitorState());
         };
         JdbcExecutionOptions executionOptions = new JdbcExecutionOptions.Builder()
                 .withBatchSize(3)
