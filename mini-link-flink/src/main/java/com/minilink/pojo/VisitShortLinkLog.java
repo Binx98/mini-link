@@ -14,6 +14,16 @@ import java.time.LocalDateTime;
 @Data
 public class VisitShortLinkLog {
     /**
+     * 账号id
+     */
+    private Long accountId;
+
+    /**
+     * 短链接码
+     */
+    private String shortLinkCode;
+
+    /**
      * ip
      */
     private String ip;

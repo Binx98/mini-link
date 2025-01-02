@@ -45,14 +45,16 @@ public class LinkUrlTocServiceImpl implements LinkUrlTocService {
             response.setStatus(HttpStatus.NOT_FOUND.value());
             return;
         }
-        if (ObjectUtils.isNotEmpty(linkUrlPO.getExpiredTime())
-                && linkUrlPO.getExpiredTime().isBefore(LocalDateTime.now())) {
+        if (ObjectUtils.isNotEmpty(linkUrlPO.getExpiredTime()) && linkUrlPO.getExpiredTime().isBefore(LocalDateTime.now())) {
             response.setStatus(HttpStatus.NOT_FOUND.value());
             return;
         }
 
-        String userAgentStr = HttpServletUtil.getRequest().getHeader("User-Agent");
-        VisitShortLinkMsg visitShortLinkMsg = KafkaMsgAdapter.buildVisitShortLinkMsg(userAgentStr);
+        VisitShortLinkMsg visitShortLinkMsg = KafkaMsgAdapter.buildVisitShortLinkMsg(
+                linkUrlPO.getAccountId(),
+                HttpServletUtil.getRequest().getHeader("User-Agent"),
+                linkUrlPO.getShortLinkCode()
+        );
         kafkaTemplate.send(KafkaConstant.ODS_CLICK_LINK_TOPIC, JSONUtil.toJsonStr(visitShortLinkMsg));
 
         response.setHeader("Location", linkUrlPO.getLongLink());

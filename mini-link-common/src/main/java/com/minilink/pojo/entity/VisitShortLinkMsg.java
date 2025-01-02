@@ -13,6 +13,11 @@ import java.time.LocalDateTime;
 @Data
 public class VisitShortLinkMsg {
     /**
+     * 账号id
+     */
+    private Long accountId;
+
+    /**
      * 访问ip
      */
     private String ip;
@@ -21,6 +26,11 @@ public class VisitShortLinkMsg {
      * 浏览器指纹
      */
     private String userAgent;
+
+    /**
+     * 短链接码
+     */
+    private String shortLinkCode;
 
     /**
      * 访问时间

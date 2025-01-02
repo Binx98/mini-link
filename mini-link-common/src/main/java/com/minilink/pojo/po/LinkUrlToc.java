@@ -31,6 +31,11 @@ public class LinkUrlToc implements Serializable {
     private Long id;
 
     /**
+     * 账号id
+     */
+    private Long accountId;
+
+    /**
      * 短链接码（1-0-cXcLm）
      */
     @TableField("short_link_code")

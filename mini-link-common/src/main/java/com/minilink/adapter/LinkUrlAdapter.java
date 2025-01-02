@@ -1,8 +1,8 @@
 package com.minilink.adapter;
 
-import com.minilink.pojo.vo.LinkUrlTobVO;
 import com.minilink.pojo.po.LinkUrlTob;
 import com.minilink.pojo.po.LinkUrlToc;
+import com.minilink.pojo.vo.LinkUrlTobVO;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -31,10 +31,11 @@ public class LinkUrlAdapter {
         return linkUrl;
     }
 
-    public static LinkUrlToc buildLinkUrlTocPO(Long id, String shortLinkCode, String shortLink,
-                                               String longLink, LocalDateTime expiredTime) {
+    public static LinkUrlToc buildLinkUrlTocPO(Long id, Long accountId, String shortLinkCode,
+                                               String shortLink, String longLink, LocalDateTime expiredTime) {
         LinkUrlToc linkUrl = new LinkUrlToc();
         linkUrl.setId(id);
+        linkUrl.setAccountId(accountId);
         linkUrl.setShortLinkCode(shortLinkCode);
         linkUrl.setShortLink(shortLink);
         linkUrl.setLongLink(longLink);

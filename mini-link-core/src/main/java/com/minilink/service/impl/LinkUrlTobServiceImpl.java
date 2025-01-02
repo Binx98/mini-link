@@ -8,10 +8,10 @@ import com.minilink.constant.RegexConstant;
 import com.minilink.enums.BusinessCodeEnum;
 import com.minilink.exception.BusinessException;
 import com.minilink.interceptor.LoginInterceptor;
-import com.minilink.pojo.vo.LinkUrlTobVO;
 import com.minilink.pojo.dto.LinkUrlSaveDTO;
 import com.minilink.pojo.po.LinkUrlTob;
 import com.minilink.pojo.po.LinkUrlToc;
+import com.minilink.pojo.vo.LinkUrlTobVO;
 import com.minilink.service.LinkUrlTobService;
 import com.minilink.store.LinkUrlTobStore;
 import com.minilink.store.LinkUrlTocStore;
@@ -23,6 +23,7 @@ import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -50,6 +51,7 @@ public class LinkUrlTobServiceImpl implements LinkUrlTobService {
     private String miniLinkDomain;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void createShortLink(LinkUrlSaveDTO saveDTO) {
         String shortLinkCode = LinkUrlUtil.generate(SnowFlakeUtil.nextId() + "&" + saveDTO.getLongLink());
         if (!shortLinkCode.matches(RegexConstant.REGEX_SHORT_LINK_FORMAT)) {
@@ -59,7 +61,6 @@ public class LinkUrlTobServiceImpl implements LinkUrlTobService {
         if (ObjectUtils.isNotEmpty(shortLinkPO)) {
             this.createShortLink(saveDTO);
         }
-
         LinkUrlTob tobLinkPO = LinkUrlAdapter.buildLinkUrlTobPO(
                 LoginInterceptor.threadLocal.get().getAccountId(),
                 ObjectUtils.isNotEmpty(saveDTO.getGroupId()) ? saveDTO.getGroupId() : miniLinkGroupId,
@@ -74,6 +75,7 @@ public class LinkUrlTobServiceImpl implements LinkUrlTobService {
         urlTobStore.saveLink(tobLinkPO);
         LinkUrlToc tocLinkPO = LinkUrlAdapter.buildLinkUrlTocPO(
                 SnowFlakeUtil.nextId(),
+                LoginInterceptor.threadLocal.get().getAccountId(),
                 shortLinkCode,
                 miniLinkDomain + shortLinkCode,
                 saveDTO.getLongLink(),
