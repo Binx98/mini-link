@@ -40,4 +40,11 @@ public interface LinkUrlTobStore extends IService<LinkUrlTob> {
      * @return 链接详情
      */
     LinkUrlTob getLinkDetail(Long id, Long accountId);
+
+    /**
+     * 根据 id 删除短链接
+     *
+     * @param id 链接id
+     */
+    Boolean deleteUrlById(Long id);
 }

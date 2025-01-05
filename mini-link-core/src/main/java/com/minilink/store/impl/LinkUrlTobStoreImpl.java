@@ -42,4 +42,9 @@ public class LinkUrlTobStoreImpl extends ServiceImpl<LinkUrlTobMapper, LinkUrlTo
                 .eq(LinkUrlTob::getAccountId, accountId)
                 .one();
     }
+
+    @Override
+    public Boolean deleteUrlById(Long id) {
+        return this.removeById(id);
+    }
 }

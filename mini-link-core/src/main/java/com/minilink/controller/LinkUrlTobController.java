@@ -64,8 +64,9 @@ public class LinkUrlTobController {
     }
 
     @Operation(summary = "删除链接")
-    @DeleteMapping("/delete")
-    public R delete() {
+    @DeleteMapping("/delete/{id}")
+    public R delete(@PathVariable Long id) {
+        urlTobService.deleteUrl(id);
         return R.out(BusinessCodeEnum.SUCCESS);
     }
 }
