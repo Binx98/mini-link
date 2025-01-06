@@ -33,6 +33,7 @@ public class LinkUrlToc implements Serializable {
     /**
      * 账号id
      */
+    @TableField(value = "account_id")
     private Long accountId;
 
     /**

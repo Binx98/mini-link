@@ -30,7 +30,7 @@ public class ClickHouseSink {
                 .withBatchSize(3)
                 .build();
         JdbcConnectionOptions connectionOptions = new JdbcConnectionOptions.JdbcConnectionOptionsBuilder()
-                .withUrl("jdbc:clickhouse://localhost:8123/default")
+                .withUrl("jdbc:clickhouse://124.70.62.67:8123/default")
                 .withDriverName("ru.yandex.clickhouse.ClickHouseDriver")
                 .withUsername("default")
                 .build();

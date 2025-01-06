@@ -1,6 +1,7 @@
 package com.minilink.app.dws;
 
 import cn.hutool.json.JSONUtil;
+import com.minilink.app.sink.ClickHouseSink;
 import com.minilink.constant.KafkaConstant;
 import com.minilink.pojo.VisitShortLinkLog;
 import com.minilink.util.DateTimeUtil;
@@ -114,7 +115,8 @@ public class DwsClickLinkApp {
                 }
         );
         reduceDS.print(">>>>>>>>DWS-reduceDS");
-//        reduceDS.addSink(ClickHouseSink.getJdbcSink("insert into link_visit_stats values(?,?,?,?,?,?,?,?,?)"));
+        reduceDS.addSink(ClickHouseSink.getJdbcSink("insert into link_visit_stats(account_id, short_link_code, ip, province, city, " +
+                "browser_type, device_type, os_type, visitor_state, pv, uv, start_time, end_time) values(?,?,?,?,?,?,?,?,?,?,?,?,?)"));
         env.execute();
     }
 }
