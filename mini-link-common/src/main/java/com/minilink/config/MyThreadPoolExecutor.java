@@ -16,12 +16,17 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class MyThreadPoolExecutor {
     public static final String THREAD_POOL_NAME = "threadPoolTaskExecutor";
 
+    /**
+     * CPU 密集型：线程数建议设置为 CPU 核心数 + 1。
+     * IO 密集型：线程数建议设置为 2 * CPU 核心数。
+     */
     @Bean(THREAD_POOL_NAME)
     public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
+        int cpuCores = Runtime.getRuntime().availableProcessors();
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(8);
-        executor.setQueueCapacity(1024);
-        executor.setMaxPoolSize(32);
+        executor.setCorePoolSize(cpuCores + 1);
+        executor.setMaxPoolSize(cpuCores + 1);
+        executor.setQueueCapacity(100);
         executor.setKeepAliveSeconds(30);
         executor.setThreadNamePrefix("mini-link-");
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());

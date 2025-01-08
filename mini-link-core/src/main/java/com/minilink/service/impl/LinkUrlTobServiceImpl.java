@@ -122,4 +122,9 @@ public class LinkUrlTobServiceImpl implements LinkUrlTobService {
         }
         return LinkUrlAdapter.buildLinkUrlTobVO(urlTob);
     }
+
+    @Override
+    public void deleteUrl(Long id) {
+
+    }
 }
